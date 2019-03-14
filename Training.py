@@ -14,6 +14,11 @@ import Evaluate
 import functools
 from tensorflow.contrib.signal.python.ops import window_ops
 
+# TODO: look at difference layer
+# TODO: look at stereo vs mono outputs/inputs?
+# TODO: DSD100 isolation
+# TODO: distortion metrics evaluation code for wav outputs
+
 ex = Experiment('Waveunet Training', ingredients=[config_ingredient])
 
 @ex.config
