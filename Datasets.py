@@ -137,7 +137,7 @@ def get_dataset(model_config, input_shape, output_shape, partition):
         dsd_train, dsd_test = getMUSDB(model_config["musdb_path"])  # List of (mix, acc, bass, drums, other, vocal) tuples
 
         # Pick 25 random songs for validation from MUSDB train set (this is always the same selection each time since we fix the random seed!)
-        val_idx = np.random.choice(len(dsd_train), size=25, replace=False)
+        val_idx = np.random.choice(len(dsd_train), size=20, replace=False)
         train_idx = [i for i in range(len(dsd_train)) if i not in val_idx]
         print("Validation with MUSDB training songs no. " + str(train_idx))
 
@@ -147,12 +147,12 @@ def get_dataset(model_config, input_shape, output_shape, partition):
         dataset["valid"] = [dsd_train[i] for i in val_idx]
         dataset["test"] = dsd_test
 
-        # MUSDB base dataset loaded now, now create task-specific dataset based on that
-        if model_config["task"] == "voice":
-            # Prepare CCMixter
-            print("Preparing CCMixter dataset!")
-            ccm = getCCMixter("CCMixter.xml")
-            dataset["train"].extend(ccm)
+        # # MUSDB base dataset loaded now, now create task-specific dataset based on that
+        # if model_config["task"] == "voice":
+        #     # Prepare CCMixter
+        #     print("Preparing CCMixter dataset!")
+        #     ccm = getCCMixter("CCMixter.xml")
+        #     dataset["train"].extend(ccm)
 
         # Convert audio files into TFRecords now
 
@@ -218,6 +218,12 @@ def get_dataset(model_config, input_shape, output_shape, partition):
 def get_path(db_path, instrument_node):
     return db_path + os.path.sep + instrument_node.xpath("./relativeFilepath")[0].text
 
+def downsample_mono_audio(audio, from_rate=44100, to_rate=16000):
+    audio = audio.swapaxes(0,1)
+    audio = librosa.core.to_mono(audio)
+    audio = librosa.core.resample(audio, from_rate, to_rate)
+    return audio
+
 def getMUSDB(database_path):
     mus = musdb.DB(root_dir=database_path, is_wav=False)
 
@@ -251,7 +257,7 @@ def getMUSDB(database_path):
             stem_audio = dict()
             for stem in ["bass", "drums", "other", "vocals"]:
                 path = track_path + "_" + stem + ".wav"
-                audio = track.targets[stem].audio
+                audio = downsample_mono_audio(track.targets[stem].audio)
                 soundfile.write(path, audio, rate, "PCM_16")
                 stem_audio[stem] = audio
                 paths[stem] = path
@@ -262,7 +268,7 @@ def getMUSDB(database_path):
             paths["accompaniment"] = acc_path
 
             # Create mixture
-            mix_audio = track.audio
+            mix_audio = downsample_mono_audio(track.audio)
             soundfile.write(mix_path, mix_audio, rate, "PCM_16")
             paths["mix"] = mix_path
 
