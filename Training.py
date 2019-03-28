@@ -85,6 +85,13 @@ def train(model_config, experiment_id, load_model=None):
     tf.summary.scalar("sep_loss", separator_loss, collections=["sup"])
     sup_summaries = tf.summary.merge_all(key='sup')
 
+    # ME
+    tf.summary.audio('mix', batch['mix'], 16000, collections=['audio_waveforms'])
+    tf.summary.audio('acc', separator_sources['acc'], 16000, collections=['audio_waveforms'])
+    tf.summary.audio('voice', separator_sources['voice'], 16000, collections=['audio_waveforms'])
+    waveform_summaries = tf.summary.merge_all(key='audio_waveforms')
+    # /ME
+
     # Start session and queue input threads
     config = tf.ConfigProto()
     config.gpu_options.allow_growth=True
@@ -108,6 +115,10 @@ def train(model_config, experiment_id, load_model=None):
     for _ in range(model_config["epoch_it"]):
         # TRAIN SEPARATOR
         _, _sup_summaries = sess.run([separator_solver, sup_summaries])
+        # ME
+        _waveform_summaries = sess.run(waveform_summaries)
+        writer.add_summary(_waveform_summaries, global_step=_global_step)
+        # /ME
         writer.add_summary(_sup_summaries, global_step=_global_step)
 
         # Increment step counter, check if maximum iterations per epoch is achieved and stop in that case
