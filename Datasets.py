@@ -250,7 +250,7 @@ def getMUSDB(database_path):
 
                 continue
 
-            rate = track.rate
+            rate = 16000 # track.rate -> 16000
 
             # Go through each instrument
             paths = dict()

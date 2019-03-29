@@ -14,10 +14,6 @@ import Evaluate
 import functools
 from tensorflow.contrib.signal.python.ops import window_ops
 
-# TODO: look at difference layer
-# TODO: look at stereo vs mono outputs/inputs?
-# TODO: DSD100 isolation
-# TODO: distortion metrics evaluation code for wav outputs
 
 ex = Experiment('Waveunet Training', ingredients=[config_ingredient])
 
@@ -86,9 +82,9 @@ def train(model_config, experiment_id, load_model=None):
     sup_summaries = tf.summary.merge_all(key='sup')
 
     # ME
-    tf.summary.audio('mix', batch['mix'], 16000, collections=['audio_waveforms'])
-    tf.summary.audio('acc', separator_sources['acc'], 16000, collections=['audio_waveforms'])
-    tf.summary.audio('voice', separator_sources['voice'], 16000, collections=['audio_waveforms'])
+    tf.summary.audio('mix', batch['mix'][:3], 16000, collections=['audio_waveforms'])
+    tf.summary.audio('accompaniment', separator_sources['accompaniment'][:3], 16000, collections=['audio_waveforms'])
+    tf.summary.audio('vocals', separator_sources['vocals'][:3], 16000, collections=['audio_waveforms'])
     waveform_summaries = tf.summary.merge_all(key='audio_waveforms')
     # /ME
 
@@ -140,7 +136,7 @@ def train(model_config, experiment_id, load_model=None):
 def optimise(model_config, experiment_id):
     epoch = 0
     best_loss = 10000
-    model_path = None
+    model_path = None 
     best_model_path = None
     for i in range(2):
         worse_epochs = 0

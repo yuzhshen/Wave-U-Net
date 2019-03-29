@@ -3,3 +3,4 @@ data/
 checkpoints/
 .vscode/
 .ipynb_checkpoints/
+logs/
