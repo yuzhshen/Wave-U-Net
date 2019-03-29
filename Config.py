@@ -17,7 +17,7 @@ def cfg():
                     "epoch_it" : 2000, # Number of supervised separator steps per epoch
                     'cache_size': 4000, # Number of audio snippets buffered in the random shuffle queue. Larger is better, since workers put multiple examples of one song into this queue. The number of different songs that is sampled from with each batch equals cache_size / num_snippets_per_track. Set as high as your RAM allows.
                     'num_workers' : 4, # Number of processes used for each TF map operation used when loading the dataset
-                    "num_snippets_per_track" : 100, # Number of snippets that should be extracted from each song at a time after loading it. Higher values make data loading faster, but can reduce the batches song diversity
+                    "num_snippets_per_track" : 50, # Number of snippets that should be extracted from each song at a time after loading it. Higher values make data loading faster, but can reduce the batches song diversity
                     'num_layers' : 12, # How many U-Net layers
                     'filter_size' : 15, # For Wave-U-Net: Filter size of conv in downsampling block
                     'merge_filter_size' : 5, # For Wave-U-Net: Filter size of conv in upsampling block
