@@ -79,16 +79,6 @@ def test(model_config, partition, model_folder, load_model):
             break
 
 
-
-    # ME
-    tf.summary.audio('mix', batch['mix'][:3], 16000, collections=['audio_waveforms'])
-    tf.summary.audio('accompaniment', separator_sources['accompaniment'][:3], 16000, collections=['audio_waveforms'])
-    tf.summary.audio('vocals', separator_sources['vocals'][:3], 16000, collections=['audio_waveforms'])
-    waveform_summaries = tf.summary.merge_all(key='audio_waveforms')
-    _waveform_summaries = sess.run(waveform_summaries)
-    writer.add_summary(_waveform_summaries, global_step=_global_step)
-    # /ME
-
     summary = tf.Summary(value=[tf.Summary.Value(tag="test_loss", simple_value=total_loss)])
     writer.add_summary(summary, global_step=_global_step)
 
