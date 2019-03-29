@@ -3,6 +3,8 @@ from Config import config_ingredient
 import tensorflow as tf
 import numpy as np
 import os
+import librosa
+
 
 import Datasets
 import Utils
@@ -112,6 +114,24 @@ def train(model_config, experiment_id, load_model=None):
     # Epoch finished - Save model
     print("Finished epoch!")
     save_path = saver.save(sess, model_config["model_base_dir"] + os.path.sep + str(experiment_id) + os.path.sep + str(experiment_id), global_step=int(_global_step))
+
+    # ME
+    model_path = save_path
+    input_path = os.path.join("audio_examples", "Lyndsey Ollard - Catching Up", "mix.wav") # Which audio file to separate
+    output_path = None # Where to save results. Default: Same location as input.
+    Evaluate.produce_source_estimates(model_config, model_path, input_path, output_path)
+    
+    np_mix = librosa.core.load(input_path, sr=16000)
+    np_voc = librosa.core.load(input_path+'_vocals.wav', sr=16000)
+    np_acc = librosa.core.load(input_path+'_accompaniment.wav', sr=16000)
+
+    tf.summary.audio('testing_mix', np_mix, 16000, collections=['tboard_audio'])
+    tf.summary.audio('testing_voc', np_voc, 16000, collections=['tboard_audio'])
+    tf.summary.audio('testing_acc', np_acc, 16000, collections=['tboard_audio'])    
+    audio_summaries = tf.summary.merge_all(key='tboard_audio')
+    _audio_summaries = sess.run(audio_summaries)
+    writer.add_summary(_audio_summaries, global_step=_global_step)
+    # /ME
 
     # Close session, clear computational graph
     writer.flush()
