@@ -4,3 +4,4 @@ checkpoints/
 .vscode/
 .ipynb_checkpoints/
 logs/
+audio_examples/

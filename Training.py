@@ -117,13 +117,17 @@ def train(model_config, experiment_id, load_model=None):
 
     # ME
     model_path = save_path
-    input_path = os.path.join("audio_examples", "Lyndsey Ollard - Catching Up", "mix.wav") # Which audio file to separate
-    output_path = None # Where to save results. Default: Same location as input.
-    Evaluate.produce_source_estimates(model_config, model_path, input_path, output_path)
+    input_path = os.path.join("audio_examples", "lyndsey", "mix.wav") # Which audio file to separate
+    output_path = os.path.join("audio_examples", "lyndsey")
+    os.system('python Predict.py with cfg.baseline_context model_path="'+model_path+'" input_path="'+input_path+'" output_path="'+output_path+'"')    
     
-    np_mix = librosa.core.load(input_path, sr=16000)
-    np_voc = librosa.core.load(input_path+'_vocals.wav', sr=16000)
-    np_acc = librosa.core.load(input_path+'_accompaniment.wav', sr=16000)
+    np_mix, _ = librosa.core.load(input_path, sr=16000)
+    np_voc, _ = librosa.core.load(input_path+'_vocals.wav', sr=16000)
+    np_acc, _ = librosa.core.load(input_path+'_accompaniment.wav', sr=16000)
+
+    np_mix = np.expand_dims(np_mix, 0)
+    np_voc = np.expand_dims(np_voc, 0)
+    np_acc = np.expand_dims(np_acc, 0)
 
     tf.summary.audio('testing_mix', np_mix, 16000, collections=['tboard_audio'])
     tf.summary.audio('testing_voc', np_voc, 16000, collections=['tboard_audio'])
